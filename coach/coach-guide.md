@@ -1,9 +1,10 @@
 # Coach Guide - Agent observability and optimization
 
-This document contains 3 sections listed below,
-- Coach Notes for customer or attendee conversations
-- Troubleshooting
-- Step by Step Walkthrough
+## Table of contents
+
+- [Coach Notes for customer or attendee conversations](#coach-notes-for-customer-or-attendee-conversations)
+- [Troubleshooting](#troubleshooting)
+- [Step by Step Walkthrough](#step-by-step-walkthrough)
 
 ## Coach Notes for customer or attendee conversations
 This section will help you drive customer conversations or trigger a brainstorming discussion for attendees during the hack. 
