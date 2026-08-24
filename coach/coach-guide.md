@@ -1,5 +1,13 @@
 # Coach Guide - Agent observability and optimization
 
+This document contains 3 sections listed below,
+- Coach Notes for customer or attendee conversations
+- Troubleshooting
+- Step by Step Walkthrough
+
+## Coach Notes for customer or attendee conversations
+This section will help you drive customer conversations or trigger a brainstorming discussion for attendees during the hack. 
+
 ## Fundamentals 
 
 ## Pre-requisites
@@ -10,7 +18,7 @@
 - az, azd, gh, copilot 
 
 **00 - Overview Objective** -- Observability, Evaluation, Optimization with Agent Service
-- Customer conversation is good enough your governance model; Key Red Flag with customer if this conversation isn't requested then workload won't go to production and no ACR
+- Customer conversation is good enough your governance model; Key Red Flag with customer if this conversation isn't requested then workload won't go to production
 - Prompt vs. Hosted Agents core workload but applicable across all Gen AI workloads
 - UI vs AZD for DevOps
 - GenAIOps workflow
@@ -49,6 +57,7 @@
 - How do you experimentation framework to run the necessary to pick the best model?
 - What are the different types of evaluations? (Batch, Human, Continuous, Production)
 - Is Regression testing a vital procedure during model selection and why?
+- Can Agent optimizer helps with evaluating model performance ?
 - Data residency and hosting strategy
 
 **04 - Create the Prompt Agent**
@@ -66,13 +75,14 @@
 - What is the difference between Agents and models in AI applications?
 - Any benefits to tool access and publishing process ?
 - Operational excellence ?
-- Is it "any model, any cloud, any framework" ?
+- Is it providing a platform for "any model, any cloud, any framework" ?
 
 **06 - Verify**
 - What is the purpose of a golden data set and the contents of this file?
 - How much data do you need in this data set and will it grow as you move across stages?
 - What are alternative ways to deploy/build agents?
 - What is the purpose of an orchestrator and name a few different frameworks?  When do you use an orchestrator
+- How you manage the routing between master and sub-agents?
 
 # Troubleshooting
 
