@@ -74,7 +74,7 @@ This section will help you drive customer conversations or trigger a brainstormi
 - At deployment time, what artifacts are deployed to support a Multi-agent application?
 - What is the value add of Foundry?  Developer IDE or Controle plane or monitor?
 - What is the difference between Agents and models in AI applications?
-- Any benefits to tool access and publishing process ?
+- For hosted agents - additional benefits such as tool access, test agents in playaround, use evals, build-in analytics and publishing process.
 - Operational excellence ?
 - Is it providing a platform for "any model, any cloud, any framework" ?
 
