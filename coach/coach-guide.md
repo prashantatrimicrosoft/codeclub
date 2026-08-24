@@ -130,6 +130,16 @@ The trap is losing a Codespace (or the `.azure/` folder) before purging.
 
 ---
 
+###  Codespace `az login --use-device-code` is blocked by Conditional Access with "Your sign-in was successful but does not meet the criteria to access this resource.
+
+**Workaround steps** 
+
+1) After your start the codespace, open the Codespace in Visual Studio Code Desktop
+2) Type and enter this in the terminal window in VS Code (match case and spacing exactly): CODESPACES=false
+3) Type 'az login' without the use-device-code switch. Do the same thing for azd auth login
+
+---
+
 ### `azd provision` fails with `invalid character 'n' after object key:value pair`
 
 **Symptom.** `azd provision` fails immediately with:
