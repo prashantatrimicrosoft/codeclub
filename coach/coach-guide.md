@@ -56,7 +56,6 @@ This section will help you drive customer conversations or trigger a brainstormi
 - What is hill climbing and how does this impact the customer?
 - Do Benchmarks matter and what is an alternative
 - How do you experimentation framework to run the necessary to pick the best model?
-- What are the different types of evaluations? (Batch, Human, Continuous, Production)
 - Is Regression testing a vital procedure during model selection and why?
 - Can Agent optimizer helps with evaluating model performance ?
 - Data residency and hosting strategy
@@ -84,6 +83,22 @@ This section will help you drive customer conversations or trigger a brainstormi
 - What are alternative ways to deploy/build agents?
 - What is the purpose of an orchestrator and name a few different frameworks?  When do you use an orchestrator
 - How you manage the routing between master and sub-agents?
+
+## Core Labs
+
+**01 - Observe Traces**
+- Traces help debugging various scenarios - permission issues, sub-agents/action issues, input/output payloads, routing transitioning, safety issues, tool calling, token consumption, latency and performance deep dive etc.. 
+- Production traces from real usage helps Agent optimizer for optimization loop
+- Have you tried Observability Agent to simplify the tracing analysis ?
+
+**02 - Eval portal**
+- What are the different types of evaluations? (Batch, Human, Continuous, Production)
+- What's the difference between running evals in portal vs CI/CD ?
+- What's the process or framework for domain team to generate ground-truth ?
+- How do you decide you need single vs multi-turn ?
+- What's the appropriate eval metrics / threshold based on agent type ?
+- Do you need all of them (custom eval, rubric eval, LLM as judge etc..)?
+- How do you scale eval process for many agents across enterprise BUs ?
 
 # Troubleshooting
 
