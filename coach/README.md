@@ -37,7 +37,8 @@ should be able to explain:
 
 The review should capture evidence, tradeoffs, reusable patterns, alternative
 approaches, and the next experiment. Plan for approximately one coach for every
-five participants.
+five participants.  Rubber Duck reviews are optional for the team and we ask the
+coaches to encourage their team to present for no more than 10 minutes.
 
 ## Exercise Tracks
 
@@ -47,13 +48,13 @@ below.
 
 | Track | Role in the event | Goal |
 | --- | --- | --- |
-| **Fundamentals** | Required readiness path | Establish a known-good environment and verified prompt-agent and hosted-agent baselines. |
-| **Core Labs** | Primary focus | Turn prompt-agent telemetry into evidence-driven improvement through Trace, Evaluate, Optimize, Monitor, and Explain. |
+| **Fundamentals** | Required env setup | Establish a known-good environment and verified prompt-agent and hosted-agent baselines. |
+| **Core Labs** | Core learnings | Turn prompt-agent telemetry into evidence-driven improvement through Trace, Evaluate, Optimize, Monitor, and Explain. |
 | **More Labs or BYOL** | Choose your Own Adventure | Transfer the loop to the hosted-agent capstone, then explore stretch work such as failed traces, load tests, model routing, additional IQ data, protect/red-team techniques, or a new contribution. |
 
 Finish Fundamentals verification before recommending a jump ahead. Stretch
-work must not prevent a team from completing and explaining the core loop. The
-[More Labs](#more-labs) are the suggested choose-your-own-adventure exercises.
+work must not prevent a team from completing and explaining the Fundamental loop. The
+[Core Labs](#core-labs) and [More Labs](#more-labs) are the suggested choose-your-own-adventure exercises.
 As the name implies, choose your own adventure means any net new content students
 want to create is acceptable and encourage them to share in code review or contribute 
 back to fork if unique approach.
@@ -66,16 +67,11 @@ and questions; do not rank them.
 | Participant | Recommended route | Coach for |
 | --- | --- | --- |
 | **Beginner** | Fundamentals, then the first Core lab | Environment confidence, vocabulary, and one successful evidence loop. |
-| **Experienced** | Fundamentals verification, then Core Labs | Evaluator choices, trace interpretation, and measurable optimization. |
-| **Advanced** | Choose Your Own Adventure after the readiness gate | Transfer to novel experiments and contribution opportunities. |
+| **Experienced** | Fundamentals verification, then Core Labs plus Capstone | Evaluator choices, trace interpretation, and measurable optimization. |
+| **Advanced** | Choose Your Own Adventure after the Fundamentals | Transfer to novel experiments and contribution opportunities. |
 
 Do not push a team forward while access, provisioning, or baseline verification
 is unresolved.
-
-> **Participant note:** The files under `coach/` contain suggested answers,
-> troubleshooting steps, and expected outcomes. Use the workshop repository for
-> participant instructions so you do not miss the opportunity to investigate the
-> challenges yourself.
 
 ## Coach's Guides
 
@@ -116,37 +112,7 @@ challenges.
 3. [More Lab 03 - Continuous evaluation](more/03-continuous-evaluation.md)
 4. [More Lab 04 - Datasets from real traces](more/04-trace-driven-datasets.md)
 
-### Shared References
-
-- [Troubleshooting](troubleshooting.md)
-
 ## Guide Taxonomy
-
-```text
-coach/
-|-- README.md                      Parent guide and event overview
-|-- troubleshooting.md            Shared environment and infrastructure help
-|-- fundamentals/
-|   |-- 00-overview.md
-|   |-- 01-provision-azd.md
-|   |-- 02-provision-portal.md
-|   |-- 03-deploy-models.md
-|   |-- 04-create-prompt-agent.md
-|   |-- 05-deploy-hosted-agent.md
-|   `-- 06-verify.md
-|-- core/
-|   |-- 00-overview.md
-|   |-- 01-observe-traces.md
-|   |-- 02-evaluate-portal.md
-|   |-- 03-optimize-skills.md
-|   |-- 04-monitor-portal.md
-|   `-- 05-capstone-hosted.md
-`-- more/
-  |-- 01-troubleshoot-trace.md
-  |-- 02-red-team.md
-  |-- 03-continuous-evaluation.md
-  `-- 04-trace-driven-datasets.md
-```
 
 Each challenge guide follows the same general pattern:
 
@@ -163,9 +129,9 @@ Each challenge guide follows the same general pattern:
 ## Coach Prerequisites
 
 Before the event, coaches should complete the workshop once and review the
-[Coach's Guide](coach/README.md) for event overview, preparation
+**Coach's Guide** for event overview, preparation
 requirements, suggested agenda, and links. Use the
-[student environment setup checklist](../CodeClubEnvSetup.pdf) to identify
+**student environment setup checklist** to identify
 access and environment blockers before the event. Confirm that participants
 have:
 
@@ -181,30 +147,10 @@ have:
   `az account show` and `azd auth status` both reporting the intended identity,
   tenant, and subscription confirms environment is ready for lab.
 
-### Student Resources
-
-Use the linked
-[agent optimization workshop](https://github.com/microsoft-foundry/agent-optimization-workshop/tree/code-club-2026)
-as the participant guide and source for lab resources. Participants were asked
-to complete the **student environment setup checklist**.  This checklist is posted
-on the Home page of the Team's channel.  Review it before you start coaching so 
-you understand the environment requirements
-
 ### Additional Coach Prerequisites
-- Record each team's intended Azure subscription, tenant, region, and
-  provisioning identity before the event.
-- Confirm that subscription activation and any required manager approval have
-  completed; a request in progress is not a usable event environment.
-- Pre-flight Azure model quota and capacity in supported regions using the same
-  subscription each team will use during the event.
-- Test the default model deployment names and note acceptable model or region
-  substitutions.
-- Prepare a shared communication channel for blockers, screenshots, and
-  code-review observations with Tech Leads team.
-- Decide whether participants will use the `azd` path, the portal path, or
-  compare both.
-- Test the workshop's experimental Copilot `workshop-coach` agent before
-  recommending it for self-guided explanations or debugging.
+- Hackathon is more than just the completion of each hack it is also a learning
+opportunity.  We recommend each coach to learn the core concepts and think through
+customer journey to help frame relevance of lab against customer journey
 
 ## Azure Requirements
 
@@ -218,7 +164,7 @@ The student setup guide identifies these Microsoft employee development
 subscription routes. Participants may use another subscription only if it
 meets the same access, billing, quota, and RBAC requirements.
 
-| Route | Preparation requirement | Authentication note |
+| Route | Preparation requirement |
 | --- | --- | --- |
 | **Internal Subscription** | Conditional Access may require opening the Codespace in VS Code Desktop and using interactive login without the device-code option. |
 | **External Subscription** | The participant owns the separate tenant and subscription; verify that both CLIs target it. |
@@ -232,25 +178,10 @@ meets the same access, billing, quota, and RBAC requirements.
   and capacity.
 - Application Insights and Log Analytics for tracing and monitoring.
 - Azure Container Registry for the hosted-agent path.
-- Storage and Azure AI Search resources used by the selected labs.
 
 The provisioning path creates these resources. Students need a subscription and
 identity allowed to create them; they should not manually create parallel
 resources unless the portal provisioning lab directs them to do so.
-
-### Permissions Required
-
-- **Owner**, or **Contributor** plus **User Access Administrator**, at the
-  subscription or target resource-group scope for provisioning resources and
-  role assignments.
-- Permission to create resource groups, Microsoft Foundry resources and
-  projects, model deployments, Application Insights, Log Analytics, Azure
-  Container Registry, Storage, and Azure AI Search resources used by the
-  selected path.
-- **Foundry User**, **Foundry Project Manager**, and **Cognitive Services OpenAI
-  Contributor** on the Foundry account.
-- Permission to purge soft-deleted Cognitive Services resources, or a process
-  for a subscription owner to perform the purge.
 
 ## Suggested Hack Agenda
 
@@ -259,16 +190,16 @@ Rubber Duck Review. Adjust it for participant experience and the selected path.
 
 ### Code Club Agenda (4 hours)
 
-| Time | Activity | Coach guide |
-| --- | --- | --- |
-| 0:00-0:15 | Welcome, objectives, environment and quota pre-flight | [Overview](fundamentals/00-overview.md) |
-| 0:15-0:45 | Choose a provisioning path and verify models | [Provision with azd](fundamentals/01-provision-azd.md), [Portal](fundamentals/02-provision-portal.md), [Models](fundamentals/03-deploy-models.md) |
-| 0:45-1:20 | Create or deploy an agent and verify it | [Prompt agent](fundamentals/04-create-prompt-agent.md), [Hosted agent](fundamentals/05-deploy-hosted-agent.md), [Verify](fundamentals/06-verify.md) |
-| 1:20-1:45 | Review the Core map, observe traces, and discuss failure modes | [Core overview](core/00-overview.md), [Observe](core/01-observe-traces.md) |
-| 1:45-2:15 | Run and interpret evaluations | [Evaluate](core/02-evaluate-portal.md) |
-| 2:15-2:45 | Optimize, re-evaluate, and monitor | [Optimize](core/03-optimize-skills.md), [Monitor](core/04-monitor-portal.md) |
-| 2:45-3:00 | Capture evidence and prepare the walkthrough | [Capstone](core/05-capstone-hosted.md) |
-| 3:00-4:00 | Rubber Duck Reviews: walk through, probe, compare, and capture | [Approach and Goals](#approach-and-goals) |
+| Time | Track | Activity | Coach guide |
+| --- | --- | --- | ---|
+| 0:00-0:15 | Kickoff | Welcome, objectives, environment and quota pre-flight | [Overview](fundamentals/00-overview.md) |
+| 0:15-0:45 | Fundamentals| Provision env and models | [Provision with azd](fundamentals/01-provision-azd.md), [Portal](fundamentals/02-provision-portal.md), [Models](fundamentals/03-deploy-models.md) |
+| 0:45-1:20 | Fundamentals | Create or deploy an agent and verify it | [Prompt agent](fundamentals/04-create-prompt-agent.md), [Hosted agent](fundamentals/05-deploy-hosted-agent.md), [Verify](fundamentals/06-verify.md) |
+| 1:20-1:45 | Core | Review the Core map, observe traces, and discuss failure modes | [Core overview](core/00-overview.md), [Observe](core/01-observe-traces.md) |
+| 1:45-2:15 | Core | Run and interpret evaluations | [Evaluate](core/02-evaluate-portal.md) |
+| 2:15-2:45 | Core | Optimize, re-evaluate, and monitor | [Optimize](core/03-optimize-skills.md), [Monitor](core/04-monitor-portal.md) |
+| 2:45-3:00 | Core | Capture evidence and prepare the walkthrough | [Capstone](core/05-capstone-hosted.md) |
+| 3:00-4:00 | Share | Rubber Duck Reviews: walk through, probe, compare, and capture | [Approach and Goals](#approach-and-goals) |
 
 The workshop estimates about 75 minutes for Fundamentals and 90 minutes for the
 Core Labs. Use the hosted-agent capstone as an extension when service

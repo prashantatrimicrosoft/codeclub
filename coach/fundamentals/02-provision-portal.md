@@ -21,18 +21,6 @@ with automated infrastructure deployment.
 - Ensure teams understand that portal-created resources are not automatically
   discovered by a new `azd` environment.
 
-### Coach Verification
-
-- Confirm the participant is in the intended tenant, subscription, Foundry
-  account, and project before any resource is created.
-- Compare the completed resource group against the `azd` path's expected
-  footprint: Foundry account and project, model deployments, Application
-  Insights, Log Analytics, container registry, and project connections.
-- Treat portal label or navigation differences as UI drift. Verify the lab's
-  intended resource and connection rather than requiring pixel-identical steps.
-- If the participant will use later scripts, link the portal-created resources
-  to the `azd` environment before continuing.
-
 ### Coaching Questions
 
 - Which manual actions would be difficult to audit or reproduce?
@@ -46,6 +34,18 @@ Participants can navigate the Foundry provisioning experience and explain the
 tradeoffs between portal-first experimentation and automated deployment. They
 can identify the same environment in both Azure portal and Foundry portal and
 have linked it to `azd` when later labs require automation.
+
+### Common Pitfalls
+
+- Confirm the participant is in the intended tenant, subscription, Foundry
+  account, and project before any resource is created.
+- Compare the completed resource group against the `azd` path's expected
+  footprint: Foundry account and project, model deployments, Application
+  Insights, Log Analytics, container registry, and project connections.
+- Treat portal label or navigation differences as UI drift. Verify the lab's
+  intended resource and connection rather than requiring pixel-identical steps.
+- If the participant will use later scripts, link the portal-created resources
+  to the `azd` environment before continuing.
 
 ---
 

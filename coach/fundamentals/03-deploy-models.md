@@ -52,12 +52,6 @@ selection criteria rather than relying on a benchmark alone. They can explain
 why the task and judge deployments may use different model tiers.
 
 ---
-
-## Common Issues & Troubleshooting
-
-See [Quota and capacity errors](../troubleshooting.md#quota-and-capacity-errors)
-when deployment is unavailable in the selected region.
-
 ### Time Management
 
 **Expected Duration:** 10 minutes

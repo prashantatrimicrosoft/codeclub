@@ -58,11 +58,6 @@ blocker and continues with the prompt-agent fallback.
 
 ---
 
-## Common Issues & Troubleshooting
-
-See [Hosted-agent deployment](../troubleshooting.md#hosted-agent-deployment) for
-authentication, conflict, image-build, and runtime failures.
-
 ### Time Management
 
 **Expected Duration:** 10 minutes
