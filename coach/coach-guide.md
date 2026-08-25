@@ -100,6 +100,12 @@ This section will help you drive customer conversations or trigger a brainstormi
 - Do you need all of them (custom eval, rubric eval, LLM as judge etc..)?
 - How do you scale eval process for many agents across enterprise BUs ?
 
+**03 - Optimize skill**
+- What all you do when you do manual tuning (change prompts, change model etc..) ? 
+- What's the difference between Optimize skill vs Agent optimizer?
+- How do you track - applying one change fixes one thing but regress others ?
+- How do you scale the tuning process for many agents across enterprise ?
+
 # Troubleshooting
 
 ## Provisioning (`azd provision`)
