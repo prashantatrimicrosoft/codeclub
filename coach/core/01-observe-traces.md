@@ -1,6 +1,6 @@
 # Core Challenge 01 - Observe Traces - Coach's Guide
 
-[← Previous: Core 00](00-overview.md) | **[⌂ Home](../coach-guide.md)** | [Next: Core 02 →](02-evaluate-portal.md)
+[← Previous: Core 00](00-overview.md) | **[⌂ Home](../README.md)** | [Next: Core 02 →](02-evaluate-portal.md)
 
 ## Notes & Guidance
 
@@ -13,9 +13,17 @@ handles grounded, multi-source, and out-of-scope requests.
 
 - Trace permission failures, routing decisions, tool calls, payloads, latency,
   token consumption, and safety behavior.
+- Distinguish a trace (one turn) from its spans (units of work), actions,
+    trajectory, evaluator events, and human annotations.
+- Treat score badges as projections of evaluator events and the Metadata view as
+    the source of truth when a summary is unclear.
+- Compare safety and quality independently. A correct refusal can remain safe
+    while a generic task-adherence evaluator scores it poorly.
 - Connect production traces to the optimizer feedback loop.
 - Encourage participants to diagnose from evidence before changing prompts.
 - Compare manual trace inspection with an observability agent.
+- Use Foundry Traces to read one turn end-to-end; use Application Insights and
+    monitoring views to assess distributions across many turns.
 
 ### Implementation Path
 
@@ -32,14 +40,33 @@ I need flights, a hotel, and a car rental.
 Can you help me write a Python script?
 ```
 
+For the grounded turn, inspect the `file_search` or `msearch` input, retrieved
+chunks, citations, model span, latency, and token counts. For an under-specified
+turn, the absence of a retrieval span is evidence that the agent asked for
+details before searching. Annotate one representative trace with the human
+reason it is good or bad; evaluator scores are signals, not ground truth.
+
 ### Coaching Questions
 
 - Did the agent use the expected data and tools?
 - Where in the trace did an incorrect behavior first appear?
 - Which latency belongs to the model, agent, or tool?
 - Did the out-of-scope instruction work on the first turn?
+- Do the evaluator explanation and the team's human annotation agree? If not,
+  which one reflects the actual business requirement?
 
 ### Success Criteria
 
 Participants can locate a relevant trace, explain its spans, and identify at
-least one behavior to evaluate systematically.
+least one behavior to evaluate systematically. They can state a root cause from
+trace evidence without optimizing from a single outlier or exposing raw
+subscription-scoped metadata in an issue.
+
+### Time Management
+
+**Expected Duration:** 20 minutes
+
+Prioritize the three supplied prompts and one representative trace. Evaluator
+scores can take a few seconds to appear; inspect available spans while they
+populate. Stop after participants can connect one score to trace evidence and
+name the behavior they will evaluate in Core Lab 02.

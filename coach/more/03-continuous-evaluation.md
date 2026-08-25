@@ -1,6 +1,6 @@
 # More Lab 03 - Continuous Evaluation - Coach's Guide
 
-[← Previous: More Lab 02](02-red-team.md) | **[⌂ Home](../coach-guide.md)** | [Next: More Lab 04 →](04-trace-driven-datasets.md)
+[← Previous: More Lab 02](02-red-team.md) | **[⌂ Home](../README.md)** | [Next: More Lab 04 →](04-trace-driven-datasets.md)
 
 ## Notes & Guidance
 
@@ -34,3 +34,7 @@ are evaluated before deployment and regressions can block a pull request.
 ### Time Management
 
 **Expected Duration:** 25 minutes
+
+Baseline the evaluation outside CI before editing the workflow. Protect enough
+time to demonstrate both outcomes: one green change and one intentional
+regression whose failure names the affected metric and delta.

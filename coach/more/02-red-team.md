@@ -1,6 +1,6 @@
 # More Lab 02 - Red-Team Your Agent - Coach's Guide
 
-[← Previous: More Lab 01](01-troubleshoot-trace.md) | **[⌂ Home](../coach-guide.md)** | [Next: More Lab 03 →](03-continuous-evaluation.md)
+[← Previous: More Lab 01](01-troubleshoot-trace.md) | **[⌂ Home](../README.md)** | [Next: More Lab 03 →](03-continuous-evaluation.md)
 
 ## Notes & Guidance
 
@@ -40,3 +40,7 @@ add a narrow mitigation, and re-run the evaluation.
 ### Time Management
 
 **Expected Duration:** 30 minutes
+
+Use a focused set of five to ten adversarial prompts. Complete one baseline run,
+one narrow mitigation, and one re-run; broader safety coverage belongs in the
+retained regression dataset.

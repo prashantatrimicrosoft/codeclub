@@ -1,6 +1,6 @@
 # Challenge 02 - Provision in the Portal - Coach's Guide
 
-[← Previous: Fundamentals 01](01-provision-azd.md) | **[⌂ Home](../coach-guide.md)** | [Next: Fundamentals 03 →](03-deploy-models.md)
+[← Previous: Fundamentals 01](01-provision-azd.md) | **[⌂ Home](../README.md)** | [Next: Fundamentals 03 →](03-deploy-models.md)
 
 ## Notes & Guidance
 
@@ -12,11 +12,26 @@ with automated infrastructure deployment.
 ### Key Points
 
 - Position the portal as useful for learning and experimentation.
+- Distinguish the Azure portal platform view (resource group and infrastructure)
+  from the Foundry portal developer view (models, agents, evaluations, and
+  traces); both represent the same underlying Foundry resources.
 - Surface the operational risks of manual, non-repeatable production changes.
 - Compare the portal blades for Basic and Standard deployment types.
 - Explain resource-level and project-level connections and RBAC boundaries.
 - Ensure teams understand that portal-created resources are not automatically
   discovered by a new `azd` environment.
+
+### Coach Verification
+
+- Confirm the participant is in the intended tenant, subscription, Foundry
+  account, and project before any resource is created.
+- Compare the completed resource group against the `azd` path's expected
+  footprint: Foundry account and project, model deployments, Application
+  Insights, Log Analytics, container registry, and project connections.
+- Treat portal label or navigation differences as UI drift. Verify the lab's
+  intended resource and connection rather than requiring pixel-identical steps.
+- If the participant will use later scripts, link the portal-created resources
+  to the `azd` environment before continuing.
 
 ### Coaching Questions
 
@@ -28,7 +43,9 @@ with automated infrastructure deployment.
 ### Success Criteria
 
 Participants can navigate the Foundry provisioning experience and explain the
-tradeoffs between portal-first experimentation and automated deployment.
+tradeoffs between portal-first experimentation and automated deployment. They
+can identify the same environment in both Azure portal and Foundry portal and
+have linked it to `azd` when later labs require automation.
 
 ---
 
@@ -37,3 +54,12 @@ tradeoffs between portal-first experimentation and automated deployment.
 Before switching from the portal path to `azd`, use the workshop linker script
 to seed the existing resource group, Foundry account, and project into the
 `azd` environment. See [Mixed provisioning paths](../troubleshooting.md#mixed-provisioning-paths).
+
+### Time Management
+
+**Expected Duration:** 15 minutes
+
+Portal project provisioning normally takes about two minutes. Use the wait to
+identify where the project endpoint will appear and to compare the Foundry and
+Azure portal views. Do not complete both provisioning paths unless comparison is
+the team's explicit learning goal.

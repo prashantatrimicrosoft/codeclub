@@ -1,6 +1,6 @@
 # More Lab 04 - Datasets from Real Traces - Coach's Guide
 
-[← Previous: More Lab 03](03-continuous-evaluation.md) | **[⌂ Home](../coach-guide.md)** | [Next: Coach guide →](../coach-guide.md)
+[← Previous: More Lab 03](03-continuous-evaluation.md) | **[⌂ Home](../README.md)** | [Next: Coach guide →](../README.md)
 
 ## Notes & Guidance
 
@@ -40,3 +40,7 @@ evaluation dataset and run the evaluation loop against it.
 ### Time Management
 
 **Expected Duration:** 30 minutes
+
+Choose one definition of an interesting trace and keep a small curation budget.
+Prioritize de-identification, schema validation, and one evaluation run over
+export volume; the source recommends well-chosen rows rather than a raw dump.

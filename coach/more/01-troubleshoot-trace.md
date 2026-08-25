@@ -1,6 +1,6 @@
 # More Lab 01 - Troubleshoot a Failing Trace - Coach's Guide
 
-[← Previous: More Labs index](../coach-guide.md#more-labs) | **[⌂ Home](../coach-guide.md)** | [Next: More Lab 02 →](02-red-team.md)
+[← Previous: More Labs index](../README.md#more-labs) | **[⌂ Home](../README.md)** | [Next: More Lab 02 →](02-red-team.md)
 
 ## Notes & Guidance
 
@@ -34,3 +34,6 @@ rationales, then test the smallest plausible fix.
 ### Time Management
 
 **Expected Duration:** 20 minutes
+
+Time-box diagnosis to one failing trace, one smallest plausible change, and one
+regression prompt. Preserve additional failure classes for a later iteration.
