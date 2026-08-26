@@ -165,7 +165,7 @@ subscription routes. Participants may use another subscription only if it
 meets the same access, billing, quota, and RBAC requirements.
 
 | Route | Preparation requirement |
-| --- | --- | --- |
+| --- | --- |
 | **Internal Subscription** | Conditional Access may require opening the Codespace in VS Code Desktop and using interactive login without the device-code option. |
 | **External Subscription** | The participant owns the separate tenant and subscription; verify that both CLIs target it. |
 | **Visual Studio Enterprise** | Activate the Azure credits benefit before the event. |

@@ -39,12 +39,6 @@ Each team has confirmed its learning goals and route, understands that
 Fundamentals is required before Core or stretch work, and can describe how
 observability and evaluation support a production AI governance model.
 
-### Common Pitfalls
-
-- Teams attempting every optional path without leaving time for evaluation.
-- Participants treating a successful model response as sufficient production
-  evidence.
-
 ### Time Management
 
 **Expected Duration:** 10 minutes

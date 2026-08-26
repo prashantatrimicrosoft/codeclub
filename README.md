@@ -62,7 +62,7 @@ than simply giving away answers.
 | Trustworthy AI and red teaming | [Trustworthy AI][trustworthy-ai] |
 | Local AI development | [Foundry Local][foundry-local] |
 
-[observability]: https://github.com/microsoft-foundry/agent-optimization-workshop/tree/code-club-2026
+[observability]: https://aka.ms/codeclub-agentopt
 [trustworthy-ai]: https://github.com/microsoft/microhacks-trust-ai
 [foundry-local]: https://github.com/microsoft-foundry/Foundry-Local-Lab
 

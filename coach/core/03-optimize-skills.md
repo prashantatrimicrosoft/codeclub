@@ -69,6 +69,61 @@ confirm whether it is better overall, not merely better on one example.
 - Restarting a completed long-running evaluation because Copilot paused; verify
 	status in the portal and ask it to continue from the existing result.
 
+## Common Issues & Troubleshooting
+
+### Missing RBAC roles for hosted-agent deploy
+
+**Symptom.** `azd deploy` returns an authorization error even though `az`
+and `azd` are freshly logged in; or `azd provision` succeeds but a later
+step (e.g. Prompt Optimizer, LLM-judge evaluators) fails with a permissions
+error.
+
+**Cause.** `azd provision` assigns the roles the deploying user and the
+project's managed identity need. If the caller lacked
+`User Access Administrator` on the RG at provision time, the role
+assignments in `infra/core/ai/ai-project.bicep` were silently skipped.
+
+**Required roles.** Grounded in `infra/core/ai/ai-project.bicep`:
+
+*Provision-time (the user running `azd provision`), on the subscription or RG:*
+
+| Role | Why |
+|------|-----|
+| **Owner** *or* **Contributor** + **User Access Administrator** | Needed to create resources **and** create role assignments |
+
+*Data-plane (the user running `azd deploy`), auto-granted on the Foundry account:*
+
+| Role | Role definition ID | Why |
+|------|--------------------|-----|
+| **Azure AI User** (aka Foundry User) | `53ca6127-db72-4b80-b1b0-d745d6d5456d` | Auth to the project endpoint |
+| **Azure AI Project Manager** | `eadc314b-1a2d-4efa-be10-5d325db5065e` | Create / update / delete hosted agents |
+| **Cognitive Services OpenAI Contributor** | `a001fd3d-188f-4b5d-821b-7da978bf7442` | Prompt Optimizer (Core 03) |
+
+The project's system-assigned managed identity also gets
+**Cognitive Services OpenAI User** and **Azure AI User** on the account for
+hosted-agent inference and LLM-judge evaluators.
+
+**Check (CLI):**
+
+```bash
+ME=$(az ad signed-in-user show --query id -o tsv)
+ACCOUNT_ID=$(az cognitiveservices account show \
+	-g "$AZURE_RESOURCE_GROUP" -n "$AZURE_AI_ACCOUNT_NAME" --query id -o tsv)
+az role assignment list --assignee "$ME" --scope "$ACCOUNT_ID" \
+	--query "[].{role:roleDefinitionName, scope:scope}" -o table
+```
+
+Expected rows include `Azure AI User`, `Azure AI Project Manager`, and
+`Cognitive Services OpenAI Contributor`.
+
+**Check (portal).** Foundry account → **Access control (IAM)** →
+**Role assignments** → filter by your UPN. Same three roles.
+
+**Fix.** Ask a subscription Owner to assign the three roles at the Foundry
+account scope, or re-run `azd provision` as an Owner.
+
+---
+
 ### Time Management
 
 **Expected Duration:** 30 minutes

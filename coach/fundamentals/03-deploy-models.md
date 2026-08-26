@@ -51,6 +51,31 @@ Both required deployments are available and participants can defend the model
 selection criteria rather than relying on a benchmark alone. They can explain
 why the task and judge deployments may use different model tiers.
 
+## Common Issues & Troubleshooting
+
+### Quota / capacity errors on `azd provision` or model deploy
+
+**Symptom.** Either:
+
+- `azd provision` fails with a quota / capacity error, or
+- In the portal, the **Deploy** button on the model card is greyed out.
+
+**Cause.** Your subscription doesn't have the requested capacity for the
+target model in the target region.
+
+**Fix.** Switch to a region with headroom (from the supported list):
+
+```bash
+azd env set AZURE_LOCATION swedencentral   # or northcentralus
+azd provision
+```
+
+For the portal path: pick a different region on the model card, or open
+**Management center → Quota** in Foundry and request an increase.
+
+**Prevent.** Pre-flight the quota before provisioning — see the workshop's
+pre-flight step 0.4 and the `microsoft-foundry` `quota` skill.
+
 ---
 ### Time Management
 

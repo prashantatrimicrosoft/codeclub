@@ -58,15 +58,6 @@ The prompt agent is active with file search, no web-search tool, and a baseline
 set of behaviors ready for tracing and evaluation. The current version is a
 coherent snapshot of its instructions, datasets, and tool configuration.
 
-### Common Pitfalls
-
-- Copying title or explanatory metadata from the baseline prompt file into the
-  Instructions field instead of copying only the prompt body.
-- Uploading both JSON and CSV copies of the same records.
-- Interpreting a still-warming index as an instruction or model failure.
-- Pasting hosted-agent instructions that reference unavailable specialist
-  tools.
-
 ### Time Management
 
 **Expected Duration:** 15 minutes

@@ -1,133 +1,354 @@
 # Shared Coach Troubleshooting
 
-Use this reference for environment and infrastructure failures that can affect
-multiple challenges. Keep challenge-specific behavior diagnosis in the relevant
-coach guide.
+## Provisioning (`azd provision`)
 
-## Provisioning
+### Soft-deleted Cognitive Services account blocks re-provision
 
-### Soft-deleted Foundry account blocks provisioning
+**Symptom.** `azd provision` fails with:
 
-**Symptom:** `azd provision` reports that a soft-deleted Cognitive Services
-resource with the same name exists.
+```text
+ERROR: A soft-deleted resource with this name exists and is blocking deployment.
+...
+FlagMustBeSetForRestore: An existing resource with ID
+'/subscriptions/…/providers/Microsoft.CognitiveServices/accounts/<name>'
+has been soft-deleted.
+```
 
-**Fix:** Purge the deleted account, or use a new environment name to generate a
-different resource name.
+`azd`'s hint text incorrectly labels this *"Azure Key Vault soft-delete
+recovery"* — the inner error names the real resource type (most often a
+Cognitive Services / Foundry account).
+
+**Cause.** A previous run (or a deleted Codespace) tore the Foundry account
+down; it remains in soft-delete for the retention window and blocks a
+same-name re-provision.
+
+**Fix (A — purge, then re-provision):**
 
 ```bash
 az cognitiveservices account list-deleted -o table
+
 az cognitiveservices account purge \
   --location <region> \
-  --resource-group <resource-group> \
+  --resource-group <rg> \
   --name <account-name>
+
 azd provision
 ```
 
-Purge requires `Microsoft.CognitiveServices/locations/deletedAccounts/delete`.
-Use `azd down --purge --force` during planned teardown to prevent recurrence.
+Purge needs `Microsoft.CognitiveServices/locations/deletedAccounts/delete` —
+plain **Contributor** may not suffice. If you hit `AuthorizationFailed`, ask a
+subscription **Owner** to purge (or use Fix B).
 
-### Conditional Access blocks Codespaces device login
+**Fix (B — sidestep with a fresh env name):**
 
-Open the Codespace in VS Code Desktop, set `CODESPACES=false` in the terminal,
-and use `az login` and `azd auth login` without the device-code switch.
+```bash
+azd env new contoso-travel-$(date +%m%d)
+azd provision
+```
 
-### Invalid character after object key/value pair
+A new env name changes the synthesized resource names, so the collision
+disappears.
 
-Non-empty JSON overrides can break substitution in
-`infra/main.parameters.json`. Reset the deployment override and provision with
-the defaults:
+**Prevent.** `azd down --purge --force` purges the account as it tears down.
+The trap is losing a Codespace (or the `.azure/` folder) before purging.
+
+---
+
+###  Codespace `az login --use-device-code` is blocked by Conditional Access with "Your sign-in was successful but does not meet the criteria to access this resource.
+
+**Workaround steps** 
+
+1) After your start the codespace, open the Codespace in Visual Studio Code Desktop
+2) Type and enter this in the terminal window in VS Code (match case and spacing exactly): CODESPACES=false
+3) Type 'az login' without the use-device-code switch. Do the same thing for azd auth login
+
+---
+
+### `azd provision` fails with `invalid character 'n' after object key:value pair`
+
+**Symptom.** `azd provision` fails immediately with:
+
+```text
+invalid character 'n' after object key:value pair
+```
+
+**Cause.** The four `*Json` params in `infra/main.parameters.json`
+(`AI_PROJECT_DEPLOYMENTS`, `AI_PROJECT_CONNECTIONS`,
+`AI_PROJECT_CREDENTIALS`, `AI_PROJECT_DEPENDENT_RESOURCES`) are
+quoted-string substitutions like `"value": "${AI_PROJECT_DEPLOYMENTS=[]}"`.
+azd 1.30 does not JSON-escape embedded `"` on substitution, so any
+non-empty override breaks the parameters file.
+
+**Fix.** Reset the override to `[]`; the defaults in `infra/main.bicep` still
+deploy `gpt-5.4-mini` + `gpt-5.4-judge`:
 
 ```bash
 azd env set AI_PROJECT_DEPLOYMENTS "[]"
 azd provision
 ```
 
-### Quota and capacity errors
+**Prevent.** Only set `AI_PROJECT_DEPLOYMENTS` (etc.) when you actually need
+a non-default deployment set, and clear it before re-provisions that add
+resources (e.g. enabling hosted agents in Lab 05). Structural fix tracked as
+`TODO(nitya)` in `infra/main.bicep`: change the four params to `array` /
+`object` types, drop the `json()` calls, and substitute without surrounding
+quotes.
 
-Use a supported region with available capacity or request quota in Foundry's
-Management center.
+---
+
+### Quota / capacity errors on `azd provision` or model deploy
+
+**Symptom.** Either:
+
+- `azd provision` fails with a quota / capacity error, or
+- In the portal, the **Deploy** button on the model card is greyed out.
+
+**Cause.** Your subscription doesn't have the requested capacity for the
+target model in the target region.
+
+**Fix.** Switch to a region with headroom (from the supported list):
 
 ```bash
-azd env set AZURE_LOCATION swedencentral
+azd env set AZURE_LOCATION swedencentral   # or northcentralus
 azd provision
 ```
 
-### No project exists
+For the portal path: pick a different region on the model card, or open
+**Management center → Quota** in Foundry and request an increase.
 
-Run `azd` from the repository root containing `azure.yaml`.
+**Prevent.** Pre-flight the quota before provisioning — see the workshop's
+pre-flight step 0.4 and the `microsoft-foundry` `quota` skill.
 
-## Authentication and RBAC
+---
 
-Refresh Azure CLI and Azure Developer CLI independently when tokens expire:
+### `azd provision` reports `no project exists — run 'azd init'`
 
-```bash
-az logout
-az login --tenant <tenant-id>
-azd auth logout
-azd auth login --tenant-id <tenant-id>
+**Symptom.**
+
+```text
+ERROR: no project exists; to create a new project, run 'azd init'
 ```
 
-The provisioning identity needs **Owner**, or **Contributor** plus **User Access
-Administrator**, at the subscription or resource-group scope. The deploying
-user needs **Foundry User**, **Foundry Project Manager**, and **Cognitive
-Services OpenAI Contributor** on the Foundry account.
+**Cause.** You're running `azd` from a folder that doesn't contain
+`azure.yaml`.
 
-## Hosted-Agent Deployment
+**Fix.** `cd` to the repo root (the folder that has `azure.yaml`) and re-run.
 
-### 409 conflict
+---
 
-A stale data-plane registration may remain for the current project and agent
-name. Purge the environment and create one with a new name before reprovisioning.
+## Hosted-agent deploy (`azd deploy`)
+
+### 409 Conflict on `azd deploy`
+
+**Symptom.**
+
+```text
+RESPONSE 409: 409 Conflict … The resource already exists or was modified
+concurrently. Please retry.
+```
+
+A plain retry doesn't clear it. The portal Agents blade may also show
+*"Project not found"*. `azd ai agent doctor` finds nothing.
+
+**Cause.** The Foundry agents data plane is holding a stale registration
+keyed on the current project/agent name — even after a torn-down deploy.
+
+**Fix.**
 
 ```bash
-azd down --purge --force
-azd env new contoso-travel-v2
+azd down --purge --force              # tear down + purge soft-delete
+azd env new contoso-travel-v2         # any new name → new account+project hash
 azd env set ENABLE_HOSTED_AGENTS true
 azd provision
 azd deploy contoso-travel-concierge
 ```
 
-### 404 subdomain does not map to a resource
+The new env name changes the `uniqueString()` hash used by the infra, giving
+you a genuinely fresh Foundry project and clearing the cache.
 
-This can indicate an expired or revoked bearer token rather than a missing
-resource. Refresh both CLI sessions using the commands in
-[Authentication and RBAC](#authentication-and-rbac).
+---
 
-### Container image not found
+### 404 `Subdomain does not map to a resource` on `azd deploy`
 
-As of August 18, 2026, Foundry remote build may accept the hosted-agent source
-without producing an image in Azure Container Registry in some tenants. Use the
-Challenge 04 prompt agent for the Core labs when this service-side issue occurs.
+**Symptom.**
 
-### Internal server error when invoking the agent
+```text
+RESPONSE 404: ResourceNotFound — Subdomain does not map to a resource
+```
 
-If monitoring logs report that the resilient task subsystem is disabled,
-enable it before starting the hosted server and redeploy:
+**Cause.** The Foundry agents data plane returns 404 (not 401) when the
+caller's bearer token is expired or revoked — typically `AADSTS50173` after
+a password change, credential rotation, or Conditional Access policy update
+that moved `TokensValidFrom` past your issued-at time. The account is fine;
+auth is stale.
+
+**Fix.** `az` and `azd` cache tokens independently, so **both** must be
+refreshed:
+
+```bash
+az logout && az login --tenant <your-tenant-id>
+azd auth logout && azd auth login --tenant-id <your-tenant-id>
+azd deploy contoso-travel-concierge
+```
+
+Quick sanity check that the resource itself is healthy (returns HTTP 200
+even unauthenticated):
+
+```bash
+curl -sS -o /dev/null -w "%{http_code}\n" \
+  "https://$(azd env get-value AZURE_AI_ACCOUNT_NAME).services.ai.azure.com/"
+```
+
+---
+
+### `refresh token has expired due to inactivity` on `azd deploy`
+
+**Symptom.**
+
+```text
+AzureDeveloperCLICredential: … The refresh token has expired due to
+inactivity. The token was issued on <date> and was inactive for 90.00:00:00.
+```
+
+**Cause.** `azd`'s cached refresh token wasn't used within its inactivity
+window (90 days).
+
+**Fix.** Same recovery as the 404 above — refresh **both** `az` and `azd`
+independently. See the 404 section for the commands.
+
+---
+
+### `An internal server error occurred` when invoking the hosted agent
+
+**Symptom.** `azd ai agent invoke` (or the Foundry portal playground) returns:
+
+```text
+ERROR: agent error (server_error): An internal server error occurred.
+```
+
+The agent monitor (`azd ai agent monitor`) logs show:
+
+```text
+ERROR azure.ai.agentserver: Resilient task subsystem missing in hosted
+environment for response <id>; failing the request
+RuntimeWarning: coroutine 'ResponsesHostServer._handle_response' was never awaited
+```
+
+An earlier startup line reads:
+
+```text
+INFO azure.ai.agentserver: TaskManager NOT initialized (resilient tasks disabled;
+enable via set_resilient_tasks_enabled(True)). tasks_declared=True
+```
+
+**Cause.** A newer version of `agent-framework-foundry-hosting` (installed via
+`remote_build`) requires the resilient task subsystem to be explicitly enabled
+before the server starts when running in a hosted environment (`is_hosted=True`).
+The function is not called in the default `main.py`, so every request fails.
+
+**Fix.** Add the `set_resilient_tasks_enabled(True)` call in `src/main.py`
+before `server.run()`, then redeploy:
 
 ```python
+# src/main.py  — add this import alongside the existing ResponsesHostServer import
 from azure.ai.agentserver.core.tasks import set_resilient_tasks_enabled
 
 def main() -> None:
-    set_resilient_tasks_enabled(True)
+    set_resilient_tasks_enabled(True)  # required for hosted environment
     server = ResponsesHostServer(_build_concierge())
     server.run()
 ```
 
-## Mixed Provisioning Paths
+```bash
+azd deploy contoso-travel-concierge
+```
 
-Portal-created resources are not automatically discovered by `azd`. Before the
-first `azd` operation after portal provisioning, run the workshop linker:
+**Prevent.** The `azure-ai-agentserver-core` package is a transitive dependency
+of `agent-framework-foundry-hosting`; no extra entry in `requirements.txt` is
+needed. If the workshop `requirements.txt` pins `agent-framework-foundry-hosting`
+to a minimum version, bump the lower bound past the version that introduced this
+requirement to catch regressions in CI.
+
+---
+
+## Auth & RBAC
+
+### Missing RBAC roles for hosted-agent deploy
+
+**Symptom.** `azd deploy` returns an authorization error even though `az`
+and `azd` are freshly logged in; or `azd provision` succeeds but a later
+step (e.g. Prompt Optimizer, LLM-judge evaluators) fails with a permissions
+error.
+
+**Cause.** `azd provision` assigns the roles the deploying user and the
+project's managed identity need. If the caller lacked
+`User Access Administrator` on the RG at provision time, the role
+assignments in `infra/core/ai/ai-project.bicep` were silently skipped.
+
+**Required roles.** Grounded in `infra/core/ai/ai-project.bicep`:
+
+*Provision-time (the user running `azd provision`), on the subscription or RG:*
+
+| Role | Why |
+|------|-----|
+| **Owner** *or* **Contributor** + **User Access Administrator** | Needed to create resources **and** create role assignments |
+
+*Data-plane (the user running `azd deploy`), auto-granted on the Foundry account:*
+
+| Role | Role definition ID | Why |
+|------|--------------------|-----|
+| **Azure AI User** (aka Foundry User) | `53ca6127-db72-4b80-b1b0-d745d6d5456d` | Auth to the project endpoint |
+| **Azure AI Project Manager** | `eadc314b-1a2d-4efa-be10-5d325db5065e` | Create / update / delete hosted agents |
+| **Cognitive Services OpenAI Contributor** | `a001fd3d-188f-4b5d-821b-7da978bf7442` | Prompt Optimizer (Core 03) |
+
+The project's system-assigned managed identity also gets
+**Cognitive Services OpenAI User** and **Azure AI User** on the account for
+hosted-agent inference and LLM-judge evaluators.
+
+**Check (CLI):**
+
+```bash
+ME=$(az ad signed-in-user show --query id -o tsv)
+ACCOUNT_ID=$(az cognitiveservices account show \
+  -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_AI_ACCOUNT_NAME" --query id -o tsv)
+az role assignment list --assignee "$ME" --scope "$ACCOUNT_ID" \
+  --query "[].{role:roleDefinitionName, scope:scope}" -o table
+```
+
+Expected rows include `Azure AI User`, `Azure AI Project Manager`, and
+`Cognitive Services OpenAI Contributor`.
+
+**Check (portal).** Foundry account → **Access control (IAM)** →
+**Role assignments** → filter by your UPN. Same three roles.
+
+**Fix.** Ask a subscription Owner to assign the three roles at the Foundry
+account scope, or re-run `azd provision` as an Owner.
+
+---
+
+## Mixed provisioning paths
+
+### UI provision + CLI deploy creates a second resource group
+
+**Symptom.** You provisioned via the portal (Lab 02), then ran
+`azd env new … && azd provision` in Lab 05 — and Azure now shows **two**
+resource groups (the portal RG + `rg-<new-env-name>`).
+
+**Cause.** `azd env new` doesn't discover existing portal-created resources.
+Without `AZURE_RESOURCE_GROUP` (and the Foundry account/project) seeded into
+the env, `azd provision` synthesizes fresh names and creates a second RG.
+
+**Fix.** Run the linker script **once** before your first `azd` step:
 
 ```bash
 ./scripts/link-portal-rg.sh
 ```
 
-It seeds the resource group, Foundry account, project, and
-`USE_EXISTING_AI_PROJECT=true` into the `azd` environment.
+The script (idempotent) auto-discovers the portal-created RG, Foundry
+account, and project, then seeds the `azd env` with `AZURE_RESOURCE_GROUP`,
+`AZURE_AI_ACCOUNT_NAME`, `AZURE_AI_PROJECT_NAME`, and
+`USE_EXISTING_AI_PROJECT=true`. After that, `azd provision` reuses the
+portal RG.
 
-## Agent Behavior
-
-Use the workshop's [failing-trace troubleshooting lab](https://github.com/microsoft-foundry/agent-optimization-workshop/blob/code-club-2026/labs/more/troubleshooting.md)
-for wrong answers, routing errors, hallucinated values, and evaluator failures.
-Apply one small change, repeat the failing turn, and then run a separate
-regression case.
+**Prevent.** If you took the portal path in Lab 02, always run the linker
+before your first `azd env new … && azd provision`.

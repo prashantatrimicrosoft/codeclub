@@ -35,25 +35,34 @@ tradeoffs between portal-first experimentation and automated deployment. They
 can identify the same environment in both Azure portal and Foundry portal and
 have linked it to `azd` when later labs require automation.
 
-### Common Pitfalls
-
-- Confirm the participant is in the intended tenant, subscription, Foundry
-  account, and project before any resource is created.
-- Compare the completed resource group against the `azd` path's expected
-  footprint: Foundry account and project, model deployments, Application
-  Insights, Log Analytics, container registry, and project connections.
-- Treat portal label or navigation differences as UI drift. Verify the lab's
-  intended resource and connection rather than requiring pixel-identical steps.
-- If the participant will use later scripts, link the portal-created resources
-  to the `azd` environment before continuing.
-
----
-
 ## Common Issues & Troubleshooting
 
-Before switching from the portal path to `azd`, use the workshop linker script
-to seed the existing resource group, Foundry account, and project into the
-`azd` environment. See [Mixed provisioning paths](../troubleshooting.md#mixed-provisioning-paths).
+### UI provision + CLI deploy creates a second resource group
+
+**Symptom.** You provisioned via the portal (Lab 02), then ran
+`azd env new … && azd provision` in Lab 05 — and Azure now shows **two**
+resource groups (the portal RG + `rg-<new-env-name>`).
+
+**Cause.** `azd env new` doesn't discover existing portal-created resources.
+Without `AZURE_RESOURCE_GROUP` (and the Foundry account/project) seeded into
+the env, `azd provision` synthesizes fresh names and creates a second RG.
+
+**Fix.** Run the linker script **once** before your first `azd` step:
+
+```bash
+./scripts/link-portal-rg.sh
+```
+
+The script (idempotent) auto-discovers the portal-created RG, Foundry
+account, and project, then seeds the `azd env` with `AZURE_RESOURCE_GROUP`,
+`AZURE_AI_ACCOUNT_NAME`, `AZURE_AI_PROJECT_NAME`, and
+`USE_EXISTING_AI_PROJECT=true`. After that, `azd provision` reuses the
+portal RG.
+
+**Prevent.** If you took the portal path in Lab 02, always run the linker
+before your first `azd env new … && azd provision`.
+
+---
 
 ### Time Management
 
